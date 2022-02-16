@@ -14,9 +14,31 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import { WalletContext } from '../../contexts/WalletContext';
 import { CreateListDialog } from './CreateListDialog';
 
+const lists = [
+  { 
+    eventName: 'Casamento',
+    hostsName: 'Fulano e Cicrano',
+    eventDate: 'dd/mm/aaaa',
+    id: '13141'
+  },
+  { 
+    eventName: 'Chá de bebê',
+    hostsName: 'Fulana',
+    eventDate: 'dd/mm/aaaa',
+    id: '1423'
+  },
+  { 
+    eventName: 'Chá de casa nova',
+    hostsName: 'Cicrana',
+    eventDate: 'dd/mm/aaaa',
+    id: '13151'
+  }
+];
+
 const Home = () => {
   const { load, checkIfWalletIsConnected } = useContext(WalletContext);
   const [showDialog, setShowDialog] = useState(false);
+  
 
   const handleCreateList = async () => {
     if (await checkIfWalletIsConnected()) {
@@ -28,8 +50,8 @@ const Home = () => {
     console.log('Gerenciar lista');
   }
 
-  const handleAccessList = () => {
-    console.log('Acessar lista');
+  const handleAccessList = (id: string) => {
+    console.log('Acessar lista', id);
   }
 
   useEffect(() => {
@@ -78,55 +100,30 @@ const Home = () => {
             <Typography variant="h4" align="center" gutterBottom>
               Quero presentear
             </Typography>
-            <List> 
-              <ListItem
-                secondaryAction={
-                  <IconButton edge="end" aria-label="Acessar lista" onClick={handleAccessList}>
-                    <RedeemIcon color="primary" />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  primary="Casamento de Fulano e Cicrano"
-                  secondary="dd/mm/aaaa"
-                />
-              </ListItem>
-              <ListItem
-                secondaryAction={
-                  <IconButton edge="end" aria-label="Presentear">
-                    <RedeemIcon color="primary" />
-                  </IconButton>
-                  }
-              >
-                <ListItemText
-                  primary="Casamento de Fulano e Cicrano"
-                  secondary="dd/mm/aaaa"
-                />
-              </ListItem>
-              <ListItem
-                secondaryAction={
-                  <IconButton edge="end" aria-label="Presentear">
-                    <RedeemIcon color="primary" />
-                  </IconButton>
-                  }
-              >
-                <ListItemText
-                  primary="Casamento de Fulano e Cicrano"
-                  secondary="dd/mm/aaaa"
-                />
-              </ListItem>
-              <ListItem
-                secondaryAction={
-                  <IconButton edge="end" aria-label="Presentear">
-                    <RedeemIcon color="primary" />
-                  </IconButton>
-                  }
-              >
-                <ListItemText
-                  primary="Chá de bebê de fulana"
-                  secondary="dd/mm/aaaa"
-                />
-              </ListItem>
+            <List>
+              {
+                lists.map((giftList) => {
+                  return (
+                    <ListItem
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          aria-label="Acessar lista"
+                          onClick={() => handleAccessList(giftList.id)}
+                        >
+                          <RedeemIcon color="primary" />
+                        </IconButton>
+                      }
+                      key={giftList.id}
+                    >
+                      <ListItemText
+                        primary={`${giftList.eventName} de ${giftList.hostsName}`}
+                        secondary={giftList.eventDate}
+                      />
+                    </ListItem>
+                  );
+                })
+              }
             </List>
           </Box>
         </Container>
