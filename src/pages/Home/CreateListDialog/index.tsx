@@ -11,6 +11,7 @@ import { ptBR } from 'date-fns/locale';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import { WalletContext } from '../../../contexts/WalletContext';
+import { useNavigate } from 'react-router-dom';
 
 type DialogProps = {
   showDialog: boolean;
@@ -24,14 +25,18 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
   const [message, setMessage] = useState('');
 
   const { giftListContract, currentAccount } = useContext(WalletContext);
+  const navigate = useNavigate();
 
   const createList = async () => {
     // Faz a transação para adicionar a lista ao contrato
-    console.log(eventDate);
     if (eventDate !== null) {
       const formatedDate = `${new Date(eventDate).getDay()}/${new Date(eventDate).getMonth()}/${new Date(eventDate).getFullYear()}`;
-      console.log(hostsName);
-      await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
+      try {
+        await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
+        navigate(currentAccount);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
