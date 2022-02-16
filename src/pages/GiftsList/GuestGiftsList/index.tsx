@@ -19,6 +19,10 @@ type PropsType = {
 };
 
 const GuestGiftsList = ({ giftList }: PropsType) => {
+
+  const handleGiveGift = () => {
+    // Chama a função de presentear do contrato
+  }
   return (
     <>
       <Box
