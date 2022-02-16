@@ -60,7 +60,7 @@ const GuestGiftsList = ({ giftList }: PropsType) => {
                   alt="random"
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h5" color="text.secondary">
+                  <Typography gutterBottom variant="h6" color="text.secondary">
                     {gift.title}
                   </Typography>
                   {

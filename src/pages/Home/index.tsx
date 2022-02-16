@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState }  from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -39,6 +40,7 @@ const Home = () => {
   const { load, checkIfWalletIsConnected } = useContext(WalletContext);
   const [showDialog, setShowDialog] = useState(false);
   
+  const navigate = useNavigate();
 
   const handleCreateList = async () => {
     if (await checkIfWalletIsConnected()) {
@@ -50,7 +52,10 @@ const Home = () => {
     console.log('Gerenciar lista');
   }
 
-  const handleAccessList = (id: string) => {
+  const handleAccessList = async (id: string) => {
+    if (await checkIfWalletIsConnected()) {
+      navigate(id);
+    }
     console.log('Acessar lista', id);
   }
 
