@@ -13,7 +13,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { GiftListType, GiftType } from '..';
+import { GiftListType, GiftType } from '../../Home';
 
 type PropsType = {
   giftList: GiftListType;

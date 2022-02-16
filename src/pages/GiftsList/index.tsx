@@ -3,24 +3,8 @@ import { useParams } from 'react-router-dom';
 import { WalletContext } from '../../contexts/WalletContext';
 import { GuestGiftsList } from './GuestGiftsList';
 import { HostGiftsList } from './HostGiftList';
+import { GiftType, GiftListType } from '../Home';
 
-export type GiftType = {
-  id: string;
-  title: string;
-  imageUrl: string;
-  price: number;
-  gifted: boolean;
-  gifter: string;
-};
-
-export type GiftListType = {
-  eventName: string;
-  hostsName: string;
-  eventDate: string;
-  message: string;
-  ownerAddress: string;
-  gifts: Array<GiftType>
-};
 
 const GiftsList = () => {
   const { giftListContract } = useContext(WalletContext);

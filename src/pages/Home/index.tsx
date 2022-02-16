@@ -1,4 +1,4 @@
-import React, { useContext, useState }  from 'react';
+import React, { useContext, useEffect, useState }  from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -14,6 +14,24 @@ import IconButton from '@mui/material/IconButton';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import { WalletContext } from '../../contexts/WalletContext';
 import { CreateListDialog } from './CreateListDialog';
+
+export type GiftType = {
+  id: string;
+  title: string;
+  imageUrl: string;
+  price: number;
+  gifted: boolean;
+  gifter: string;
+};
+
+export type GiftListType = {
+  eventName: string;
+  hostsName: string;
+  eventDate: string;
+  message: string;
+  ownerAddress: string;
+  gifts: Array<GiftType>
+};
 
 const lists = [
   { 
@@ -37,8 +55,10 @@ const lists = [
 ];
 
 const Home = () => {
-  const { checkIfWalletIsConnected } = useContext(WalletContext);
+  const { checkIfWalletIsConnected, giftListContract, currentAccount, load } = useContext(WalletContext);
+
   const [showDialog, setShowDialog] = useState(false);
+  const [allLists, setAllLists] = useState<GiftListType[]>([]);
   
   const navigate = useNavigate();
 
@@ -57,6 +77,40 @@ const Home = () => {
       navigate(address);
     }
   }
+
+  useEffect(() => {
+    const getAllLists = async() => {
+      const lists = await giftListContract.methods.returnAllLists().call();
+      const eventsList = [];
+      if (lists !== undefined) {
+        for (const list of lists) {
+          const { 
+            eventName,
+            hostsName,
+            eventDate,
+            ownerAddress,
+            gifts,
+            message
+          } : GiftListType = list;
+          
+          
+          eventsList.push({
+            eventName,
+            hostsName,
+            eventDate,
+            ownerAddress,
+            gifts,
+            message
+          });
+        }
+
+        setAllLists(eventsList);
+      }
+    }
+
+    load();
+    getAllLists();
+  }, []);
 
   return (
     <>
@@ -100,29 +154,37 @@ const Home = () => {
             <Typography variant="h4" align="center" gutterBottom>
               Quero presentear
             </Typography>
-            <List>
-              {
-                lists.map((giftList) => (
-                  <ListItem
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="Acessar lista"
-                        onClick={() => handleAccessList(giftList.address)}
+            { allLists.length > 0 
+              ? (
+                <List>
+                  {
+                    allLists.map((giftList) => (
+                      <ListItem
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            aria-label="Acessar lista"
+                            onClick={() => handleAccessList(giftList.ownerAddress)}
+                          >
+                            <RedeemIcon color="primary" />
+                          </IconButton>
+                        }
+                        key={giftList.ownerAddress}
                       >
-                        <RedeemIcon color="primary" />
-                      </IconButton>
-                    }
-                    key={giftList.address}
-                  >
-                    <ListItemText
-                      primary={`${giftList.eventName} de ${giftList.hostsName}`}
-                      secondary={giftList.eventDate}
-                    />
-                  </ListItem>
-                ))
-              }
-            </List>
+                        <ListItemText
+                          primary={`${giftList.eventName} de ${giftList.hostsName}`}
+                          secondary={giftList.eventDate}
+                        />
+                      </ListItem>
+                    ))
+                  }
+                </List>
+              ) : (
+                <Typography align="center" gutterBottom>
+                  Ainda não existem listas de presentes cadastradas.
+                </Typography>
+              )
+            }
           </Box>
         </Container>
       </Box>

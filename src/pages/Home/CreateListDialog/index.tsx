@@ -28,9 +28,18 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
   const navigate = useNavigate();
 
   const createList = async () => {
-    // Faz a transação para adicionar a lista ao contrato
     if (eventDate !== null) {
-      const formatedDate = `${new Date(eventDate).getDay()}/${new Date(eventDate).getMonth()}/${new Date(eventDate).getFullYear()}`;
+      let year = new Date(eventDate).getFullYear();
+      let month = String(new Date(eventDate).getMonth() + 1);
+      let day = String(new Date(eventDate).getDay());
+
+      if (Number(day) < 10) {
+        day = '0' + day;
+      }
+      if (Number(month) < 10) {
+        month = '0' + month;
+      }
+      const formatedDate = `${day}/${month}/${year}`;
       try {
         await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
         navigate(currentAccount);
