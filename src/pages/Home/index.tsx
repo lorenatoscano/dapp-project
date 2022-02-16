@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState }  from 'react';
+import React, { useContext, useState }  from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -20,24 +20,24 @@ const lists = [
     eventName: 'Casamento',
     hostsName: 'Fulano e Cicrano',
     eventDate: 'dd/mm/aaaa',
-    id: '13141'
+    address: '13141'
   },
   { 
     eventName: 'Chá de bebê',
     hostsName: 'Fulana',
     eventDate: 'dd/mm/aaaa',
-    id: '1423'
+    address: '1423'
   },
   { 
     eventName: 'Chá de casa nova',
     hostsName: 'Cicrana',
     eventDate: 'dd/mm/aaaa',
-    id: '13151'
+    address: '13151'
   }
 ];
 
 const Home = () => {
-  const { load, checkIfWalletIsConnected } = useContext(WalletContext);
+  const { checkIfWalletIsConnected } = useContext(WalletContext);
   const [showDialog, setShowDialog] = useState(false);
   
   const navigate = useNavigate();
@@ -52,16 +52,11 @@ const Home = () => {
     console.log('Gerenciar lista');
   }
 
-  const handleAccessList = async (id: string) => {
+  const handleAccessList = async (address: string) => {
     if (await checkIfWalletIsConnected()) {
-      navigate(id);
+      navigate(address);
     }
-    console.log('Acessar lista', id);
   }
-
-  useEffect(() => {
-    load();
-  }, []);
 
   return (
     <>
@@ -113,12 +108,12 @@ const Home = () => {
                       <IconButton
                         edge="end"
                         aria-label="Acessar lista"
-                        onClick={() => handleAccessList(giftList.id)}
+                        onClick={() => handleAccessList(giftList.address)}
                       >
                         <RedeemIcon color="primary" />
                       </IconButton>
                     }
-                    key={giftList.id}
+                    key={giftList.address}
                   >
                     <ListItemText
                       primary={`${giftList.eventName} de ${giftList.hostsName}`}

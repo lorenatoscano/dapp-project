@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -10,6 +10,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { ptBR } from 'date-fns/locale';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
+import { WalletContext } from '../../../contexts/WalletContext';
 
 type DialogProps = {
   showDialog: boolean;
@@ -17,13 +18,21 @@ type DialogProps = {
 };
 
 const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
-  const [date, setDate] = useState(null);
+  const [eventDate, setEventDate] = useState(null);
   const [hostsName, setHostsName] = useState('');
   const [eventName, setEventName] = useState('');
   const [message, setMessage] = useState('');
 
-  const createList = () => {
+  const { giftListContract, currentAccount } = useContext(WalletContext);
+
+  const createList = async () => {
     // Faz a transação para adicionar a lista ao contrato
+    console.log(eventDate);
+    if (eventDate !== null) {
+      const formatedDate = `${new Date(eventDate).getDay()}/${new Date(eventDate).getMonth()}/${new Date(eventDate).getFullYear()}`;
+      console.log(hostsName);
+      await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
+    }
   }
 
   return (
@@ -57,8 +66,8 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
           <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
             <DatePicker
               label="Data do evento"
-              value={date}
-              onChange={setDate}
+              value={eventDate}
+              onChange={(newDate) => setEventDate(newDate)}
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>

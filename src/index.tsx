@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { Home } from './pages/Home';
 import { GiftsList } from './pages/GiftsList';
+import { App } from './App';
 import { WalletContextProvider } from './contexts/WalletContext';
 import './styles/global.css';
 
@@ -13,8 +14,10 @@ ReactDOM.render(
     <WalletContextProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path=":address" element={<GiftsList />} />
+          <Route path="/" element={<App />}>
+            <Route index element={<Home />} />
+            <Route path=":address" element={<GiftsList />} />
+          </Route>
         </Routes>
       </Router>
     </WalletContextProvider>

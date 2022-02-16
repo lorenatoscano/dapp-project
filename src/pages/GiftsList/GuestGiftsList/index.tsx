@@ -53,7 +53,7 @@ const GuestGiftsList = ({ giftList }: PropsType) => {
       <Container sx={{ py: 4 }} maxWidth="md">
         <Grid container spacing={4}>
           {giftList.gifts.map((gift: GiftType) => (
-            <Grid item key={gift.title} xs={12} sm={6} md={4}>
+            <Grid item key={gift.id} xs={12} sm={6} md={4}>
               <Card
                 sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
               >
