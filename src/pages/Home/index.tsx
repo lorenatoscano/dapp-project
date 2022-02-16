@@ -15,22 +15,26 @@ import { WalletContext } from '../../contexts/WalletContext';
 import { CreateListDialog } from './CreateListDialog';
 
 const Home = () => {
-  const { connectWalletHandler } = useContext(WalletContext);
+  const { load, checkIfWalletIsConnected } = useContext(WalletContext);
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleCreateList = () => {
-    setShowDialog(true);
-    connectWalletHandler();
-
+  const handleCreateList = async () => {
+    if (await checkIfWalletIsConnected()) {
+      setShowDialog(true);
+    }
   }
 
   const handleManageList = () => {
-    connectWalletHandler();
+    console.log('Gerenciar lista');
   }
 
   const handleAccessList = () => {
-    connectWalletHandler();
+    console.log('Acessar lista');
   }
+
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
     <>

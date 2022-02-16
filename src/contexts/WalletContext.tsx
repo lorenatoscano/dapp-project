@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useState
 } from 'react';
-// import Web3 from 'web3';
+import Web3 from 'web3';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
@@ -14,58 +14,90 @@ type WalletContextProviderProps = {
 };
 
 type WalletContextType = {
-  currentAccount: any;
-  connectWalletHandler: () => Promise<void>;
-  checkWalletIsConnected: () => Promise<void>;
+  currentAccount: string;
+  load: () => Promise<void>;
+  checkIfWalletIsConnected: () => Promise<boolean>;
 };
 
 export const WalletContext = createContext({} as WalletContextType);
 
 export const WalletContextProvider = ({ children }: WalletContextProviderProps) => {
   const [showAlert, setShowAlert] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState(null);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [currentAccount, setCurrentAccount] = useState('');
 
-  const checkWalletIsConnected = async () => {
+  const load = async () => {
     const { ethereum } = window;
 
-    if (!ethereum) {
-      setShowAlert(true);
-    }
-
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-
-    if (accounts.length !== 0) {
-      setCurrentAccount(accounts[0]);
+    if (ethereum) {
+      try {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts > 0) {
+          setCurrentAccount(accounts[0]);
+        }
+      } catch (error) {
+        triggerAlert('Autorize o acesso à MetaMask para utilizar a aplicação.');
+        console.error(error);
+      }  
+      // const web3 = new Web3(ethereum);
+    } else {
+      triggerAlert('Por favor, instale a MetaMask!');
     }
   }
 
-  const connectWalletHandler = async () => {
+  const checkIfWalletIsConnected = async() => {
     const { ethereum } = window;
-
-    if (!ethereum) {
-      setShowAlert(true);
+    if (ethereum) {
+      try {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts > 0) {
+          setCurrentAccount(accounts[0]);
+          return true;
+        }
+      } catch (error) {
+        triggerAlert('Autorize o acesso à MetaMask para utilizar a aplicação.');
+        console.error(error);
+        return false;
+      }  
+    } else {
+      triggerAlert('Por favor, instale a MetaMask!');
     }
 
-    try {
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      setCurrentAccount(accounts[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    return false;
+  }
+
+  const triggerAlert = (message: string) => {
+    setAlertMessage(message);
+    setShowAlert(true);
+  }
 
   useEffect(() => {
-    checkWalletIsConnected();
+    const { ethereum } = window;
+    
+    if (!ethereum) return;
+  
+    const listener = ([newAccount]: string[]) => {
+      console.log('Conta mudou', newAccount);
+      setCurrentAccount(newAccount);
+    };
+  
+    // Escuta atualizações
+    ethereum.on('accountsChanged', listener);
+    
+    // Remove o listener ao desmontar o componente
+    return () => {
+      ethereum.removeListener('accountsChanged', listener);
+    };
   }, []);
 
   return (
-    <WalletContext.Provider value={{ currentAccount, connectWalletHandler, checkWalletIsConnected }}>
+    <WalletContext.Provider value={{ currentAccount, load, checkIfWalletIsConnected }}>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={showAlert}
         autoHideDuration={6000}
         onClose={() => setShowAlert(false)}
-        message="Por favor, instale a MetaMask!"
+        message={alertMessage}
         action={
           <IconButton
             size="small"
