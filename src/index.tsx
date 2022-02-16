@@ -5,6 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { Home } from './pages/Home';
 import { GiftsList } from './pages/GiftsList';
 import { WalletContextProvider } from './contexts/WalletContext';
+import './styles/global.css';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -102,27 +102,25 @@ const Home = () => {
             </Typography>
             <List>
               {
-                lists.map((giftList) => {
-                  return (
-                    <ListItem
-                      secondaryAction={
-                        <IconButton
-                          edge="end"
-                          aria-label="Acessar lista"
-                          onClick={() => handleAccessList(giftList.id)}
-                        >
-                          <RedeemIcon color="primary" />
-                        </IconButton>
-                      }
-                      key={giftList.id}
-                    >
-                      <ListItemText
-                        primary={`${giftList.eventName} de ${giftList.hostsName}`}
-                        secondary={giftList.eventDate}
-                      />
-                    </ListItem>
-                  );
-                })
+                lists.map((giftList) => (
+                  <ListItem
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="Acessar lista"
+                        onClick={() => handleAccessList(giftList.id)}
+                      >
+                        <RedeemIcon color="primary" />
+                      </IconButton>
+                    }
+                    key={giftList.id}
+                  >
+                    <ListItemText
+                      primary={`${giftList.eventName} de ${giftList.hostsName}`}
+                      secondary={giftList.eventDate}
+                    />
+                  </ListItem>
+                ))
               }
             </List>
           </Box>
