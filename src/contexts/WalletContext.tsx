@@ -28,6 +28,7 @@ type WalletContextType = {
   removeGift: (id: number) => Promise<any>;
   finishList: () => Promise<any>;
   toGift: (id: number, toAddress: string, price: string) => Promise<any>;
+  triggerAlert: (message: string) => void;
 };
 
 export const WalletContext = createContext({} as WalletContextType);
@@ -170,7 +171,8 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
       addGift,
       removeGift,
       finishList,
-      toGift
+      toGift,
+      triggerAlert
     }),
     [currentAccount]
   );

@@ -36,7 +36,7 @@ export type GiftListType = {
 };
 
 const Home = () => {
-  const { returnAllLists, isInitialized, load } = useContext(WalletContext);
+  const { returnAllLists, isInitialized, load, triggerAlert, currentAccount } = useContext(WalletContext);
 
   const [showDialog, setShowDialog] = useState(false);
   const [allLists, setAllLists] = useState<GiftListType[]>([]);
@@ -52,8 +52,18 @@ const Home = () => {
     setShowDialog(true);
   }
 
-  const handleManageList = () => {
-    // navigate(address);
+  const handleManageList = async() => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    const targetList = allLists.find(list => list.ownerAddress.toUpperCase() === currentAccount.toUpperCase());
+
+    if (targetList) {
+      navigate(targetList.ownerAddress);
+    } else {
+      triggerAlert('Nenhuma lista registrada para esta conta! Crie uma lista');
+    }
   }
 
   const handleAccessList = async (address: string) => {
