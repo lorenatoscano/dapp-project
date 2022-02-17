@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useState, useContext }  from 'react';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -13,15 +13,26 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import { GiftListType, GiftType } from '../../Home';
+import { useParams } from 'react-router-dom';
+import { WalletContext } from '../../../contexts/WalletContext';
 
 type PropsType = {
   giftList: GiftListType;
 };
 
 const GuestGiftsList = ({ giftList }: PropsType) => {
+  const { giftListContract, currentAccount } = useContext(WalletContext);
+  const { address } = useParams();
 
-  const handleGiveGift = () => {
-    // Chama a função de presentear do contrato
+  const handleGiveGift = async(id: number, price: number) => {
+    try {
+      if (giftListContract) {
+        await giftListContract.methods.toGift(id, address).send({ from: currentAccount, value: price});
+        // navigate(`/${currentAccount}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
   return (
     <>
@@ -86,10 +97,10 @@ const GuestGiftsList = ({ giftList }: PropsType) => {
                     </Tooltip>
                     
                     <Typography variant="h6">
-                      {gift.price}
+                      {gift.price/1000000000000000000}
                     </Typography>
                   </Stack>
-                  <Button variant="contained" disabled={gift.gifted}>
+                  <Button variant="contained" disabled={gift.gifted} onClick={() => handleGiveGift(gift.id, gift.price)}>
                     Presentear
                   </Button>
                 </CardActions>

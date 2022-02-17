@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React, { useContext, useState }  from 'react';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -14,19 +14,60 @@ import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { GiftListType, GiftType } from '../../Home';
+import { WalletContext } from '../../../contexts/WalletContext';
+import { TextField } from '@material-ui/core';
+import { useNavigate } from 'react-router-dom';
 
 type PropsType = {
   giftList: GiftListType;
 };
 
 const HostGiftsList = ({ giftList }: PropsType) => {
+  const { giftListContract, currentAccount } = useContext(WalletContext);
+
+  const [title, setTitle] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [price, setPrice] = useState(0);
+
+  const navigate = useNavigate();
+
   const copyCurrentURLToClipboard = () => {
     const currentURL = window.location.href;
     navigator.clipboard.writeText(currentURL);
   }
 
-  const handleRemoveGift = () => {
-    // Chama a função de remover do contrato
+  const handleAddGift = async() => {
+    try {
+      if (giftListContract) {
+        await giftListContract.methods.addGift(String(price * Math.pow(10, 18)), title, imageUrl).send({ from: currentAccount });
+        navigate(`/${currentAccount}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
+  const handleRemoveGift = async(id: number) => {
+    try {
+      if (giftListContract) {
+        await giftListContract.methods.removeGift(id).send({ from: currentAccount });
+        navigate(`/${currentAccount}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleCloseList = async() => {
+    try {
+      if (giftListContract) {
+        await giftListContract.methods.finishList.send({ from: currentAccount });
+        navigate('/');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -54,12 +95,67 @@ const HostGiftsList = ({ giftList }: PropsType) => {
           <Typography variant="h6" align="center" color="text.secondary" paragraph>
             Compartilhe este link com seus convidados para acessarem sua lista
           </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button variant="outlined" startIcon={<ContentCopyIcon />} onClick={copyCurrentURLToClipboard}>
+              Copiar link
+            </Button>
+            <Button variant="outlined" color="error" onClick={handleCloseList}>
+              Encerrar lista
+            </Button>
+          </Stack>
           
-          <Button variant="outlined" startIcon={<ContentCopyIcon />} onClick={copyCurrentURLToClipboard}>
-            Copiar link
-          </Button>
         </Stack>
       </Box>
+      <Container maxWidth="md">
+        <Grid container direction="row" spacing={2}>
+          <Grid item xs={9}>
+            <TextField
+              id="title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              required
+              autoFocus
+              margin="dense"
+              label="Título do presente"
+              fullWidth
+              variant="outlined"
+              placeholder="Ex: Geladeira"
+            /> 
+            <TextField
+              id="image-url"
+              value={imageUrl}
+              onChange={(event) => setImageUrl(event.target.value)}
+              required
+              autoFocus
+              margin="dense"
+              label="Imagem ilustrativa"
+              fullWidth
+              variant="outlined"
+              placeholder="Ex: https://url"
+            /> 
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              id="price"
+              value={price}
+              onChange={(event) => setPrice(Number(event.target.value))}
+              required
+              autoFocus
+              type="number"
+              margin="dense"
+              label="Preço (em ETH)"
+              fullWidth
+              variant="outlined"
+              placeholder="Ex: 1"
+            /> 
+
+            <Button color="primary" variant="contained" sx={{ width: '100%', mt: 1 }} onClick={handleAddGift}>
+              Adicionar presente
+            </Button>
+          </Grid>
+        </Grid>
+      </Container>
+      
       <Container sx={{ py: 4 }} maxWidth="md">
         <Grid container spacing={4}>
           {giftList.gifts.map((gift: GiftType) => (
@@ -96,10 +192,10 @@ const HostGiftsList = ({ giftList }: PropsType) => {
                     </Tooltip>
                     
                     <Typography variant="h6">
-                      {gift.price}
+                      {gift.price/1000000000000000000}
                     </Typography>
                   </Stack>
-                  <Button variant="contained" color="error" onClick={handleRemoveGift}>
+                  <Button variant="contained" color="error" onClick={() => handleRemoveGift(gift.id)}>
                     Remover
                   </Button>
                 </CardActions>

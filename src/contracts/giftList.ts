@@ -1,6 +1,19 @@
-export const contractAddress = '0x9e1a19844AD3010D4F217867631e0Dc44fBE5Ac8';
+export const contractAddress = '0x92ff0447229f6895d8867ab91c1cc05b8345352e';
 
 export const abi = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "listOwner",
+				"type": "address"
+			}
+		],
+		"name": "ListUpdated",
+		"type": "event"
+	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -436,7 +449,7 @@ export const abi = [
 				"type": "address"
 			}
 		],
-		"name": "to_gift",
+		"name": "toGift",
 		"outputs": [
 			{
 				"internalType": "bool",

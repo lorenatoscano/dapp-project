@@ -41,8 +41,10 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
       }
       const formatedDate = `${day}/${month}/${year}`;
       try {
-        await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
-        navigate(currentAccount);
+        if (giftListContract) {
+          await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
+          navigate(currentAccount);
+        }
       } catch (error) {
         console.log(error);
       }

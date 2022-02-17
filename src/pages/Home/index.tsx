@@ -12,11 +12,13 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import RedeemIcon from '@mui/icons-material/Redeem';
+import { CircularProgress } from '@mui/material';
 import { WalletContext } from '../../contexts/WalletContext';
 import { CreateListDialog } from './CreateListDialog';
 
+
 export type GiftType = {
-  id: string;
+  id: number;
   title: string;
   imageUrl: string;
   price: number;
@@ -33,32 +35,12 @@ export type GiftListType = {
   gifts: Array<GiftType>
 };
 
-const lists = [
-  { 
-    eventName: 'Casamento',
-    hostsName: 'Fulano e Cicrano',
-    eventDate: 'dd/mm/aaaa',
-    address: '13141'
-  },
-  { 
-    eventName: 'Chá de bebê',
-    hostsName: 'Fulana',
-    eventDate: 'dd/mm/aaaa',
-    address: '1423'
-  },
-  { 
-    eventName: 'Chá de casa nova',
-    hostsName: 'Cicrana',
-    eventDate: 'dd/mm/aaaa',
-    address: '13151'
-  }
-];
-
 const Home = () => {
   const { checkIfWalletIsConnected, giftListContract, currentAccount, load } = useContext(WalletContext);
 
   const [showDialog, setShowDialog] = useState(false);
   const [allLists, setAllLists] = useState<GiftListType[]>([]);
+  const [isLoading, setLoading] = useState(true);
   
   const navigate = useNavigate();
 
@@ -79,10 +61,11 @@ const Home = () => {
   }
 
   useEffect(() => {
+    console.log("contrato:", giftListContract);
     const getAllLists = async() => {
-      const lists = await giftListContract.methods.returnAllLists().call();
-      const eventsList = [];
-      if (lists !== undefined) {
+      if (giftListContract) {
+        const lists = await giftListContract.methods.returnAllLists().call();
+        const eventsList = [];
         for (const list of lists) {
           const { 
             eventName,
@@ -105,10 +88,10 @@ const Home = () => {
         }
 
         setAllLists(eventsList);
+        setLoading(false);
       }
     }
-
-    load();
+    // load();
     getAllLists();
   }, []);
 
@@ -154,36 +137,41 @@ const Home = () => {
             <Typography variant="h4" align="center" gutterBottom>
               Quero presentear
             </Typography>
-            { allLists.length > 0 
+            { isLoading 
               ? (
-                <List>
-                  {
-                    allLists.map((giftList) => (
-                      <ListItem
-                        secondaryAction={
-                          <IconButton
-                            edge="end"
-                            aria-label="Acessar lista"
-                            onClick={() => handleAccessList(giftList.ownerAddress)}
-                          >
-                            <RedeemIcon color="primary" />
-                          </IconButton>
-                        }
-                        key={giftList.ownerAddress}
-                      >
-                        <ListItemText
-                          primary={`${giftList.eventName} de ${giftList.hostsName}`}
-                          secondary={giftList.eventDate}
-                        />
-                      </ListItem>
-                    ))
-                  }
-                </List>
-              ) : (
-                <Typography align="center" gutterBottom>
-                  Ainda não existem listas de presentes cadastradas.
-                </Typography>
-              )
+                <Stack alignItems="center">
+                  <CircularProgress />
+                </Stack>
+              ) : allLists.length > 0 
+                ? (
+                  <List>
+                    {
+                      allLists.map((giftList) => (
+                        <ListItem
+                          secondaryAction={
+                            <IconButton
+                              edge="end"
+                              aria-label="Acessar lista"
+                              onClick={() => handleAccessList(giftList.ownerAddress)}
+                            >
+                              <RedeemIcon color="primary" />
+                            </IconButton>
+                          }
+                          key={giftList.ownerAddress}
+                        >
+                          <ListItemText
+                            primary={`${giftList.eventName} de ${giftList.hostsName}`}
+                            secondary={giftList.eventDate}
+                          />
+                        </ListItem>
+                      ))
+                    }
+                  </List>
+                ) : (
+                  <Typography align="center" gutterBottom>
+                    Ainda não existem listas de presentes cadastradas.
+                  </Typography>
+                )
             }
           </Box>
         </Container>

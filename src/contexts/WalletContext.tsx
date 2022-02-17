@@ -20,7 +20,7 @@ type WalletContextType = {
   currentAccount: string;
   load: () => Promise<void>;
   checkIfWalletIsConnected: () => Promise<boolean>;
-  giftListContract: Contract;
+  giftListContract: Contract | undefined;
 };
 
 export const WalletContext = createContext({} as WalletContextType);
@@ -29,7 +29,7 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [currentAccount, setCurrentAccount] = useState('');
-  const [giftListContract, setGiftListContract] = useState<Contract>({} as Contract);
+  const [giftListContract, setGiftListContract] = useState<Contract>();
 
   const load = async () => {
     const { ethereum } = window;
@@ -46,7 +46,6 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
       }  
       const web3 = new Web3(ethereum);
       setGiftListContract(new web3.eth.Contract(abi as AbiItem[], contractAddress));
-
     } else {
       triggerAlert('Por favor, instale a MetaMask!');
     }
@@ -84,7 +83,6 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
     if (!ethereum) return;
   
     const listener = ([newAccount]: string[]) => {
-      console.log('Conta mudou', newAccount);
       setCurrentAccount(newAccount);
     };
   

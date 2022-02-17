@@ -1,65 +1,81 @@
-import React, { useContext }  from 'react';
+import React, { useContext, useEffect, useState }  from 'react';
 import { useParams } from 'react-router-dom';
 import { WalletContext } from '../../contexts/WalletContext';
 import { GuestGiftsList } from './GuestGiftsList';
 import { HostGiftsList } from './HostGiftList';
 import { GiftType, GiftListType } from '../Home';
+import { Container, Stack, Typography } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 
 
 const GiftsList = () => {
-  const { giftListContract } = useContext(WalletContext);
-  const params = useParams();
+  const { giftListContract, currentAccount, load } = useContext(WalletContext);
 
-  const getGiftList = () => {
-    // Obtém os detalhes da lista de presentes no contrato pelo parametro da url (id ou address)
-    // await giftListContract.methods.returnList(params.address).call();
-    return { 
-      eventName: 'Casamento',
-      hostsName: 'Fulano e Cicrano',
-      eventDate: 'dd/mm/aaaa',
-      message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam gravida posuere turpis ut porttitor.',
-      ownerAddress: '0x8f31b382168073a87e37b8bb4da73a93589a0ba8',
-      gifts: [
-        {
-          title: 'Panela de pressão',
-          imageUrl: 'https://source.unsplash.com/random',
-          price: 0.1,
-          gifted: true,
-          gifter: '0x000000000000000000000000000000000000000000',
-          id: '8614814'
-        },
-        {
-          title: 'Viagem para pipa',
-          imageUrl: 'https://source.unsplash.com/random',
-          price: 0.1,
-          gifted: false,
-          gifter: '0x000000000000000000000000000000000000000000',
-          id: '4387292852'
-        },
-        {
-          title: 'Hotel 5 estrelas',
-          imageUrl: 'https://source.unsplash.com/random',
-          price: 0.1,
-          gifted: false,
-          gifter: '0x000000000000000000000000000000000000000000',
-          id: 'i4y2375i2i'
-        }
-      ]
-    };
-  }
+  const [currentGiftList, setCurrentGiftList] = useState<GiftListType>();
+  const [isLoading, setLoading] = useState(true);
+
+  const { address } = useParams();
+
 
   const isListOwner = () => {
     // Verifica se o endereço da conta atual é o mesmo do dono da lista
-
-    return true;
+    return address?.toUpperCase() === currentAccount.toUpperCase();
   }
+
+  const getListByAddress = async() => {
+    if (giftListContract) {
+      const list = await giftListContract.methods.returnList(address).call();
+      let { 
+        eventName,
+        hostsName,
+        eventDate,
+        ownerAddress,
+        gifts,
+        message
+      } : GiftListType = list;
+
+      if (gifts.length && gifts[0].title === "") {
+        gifts = [];
+      }
+      setCurrentGiftList({ 
+        eventName,
+        hostsName,
+        eventDate,
+        ownerAddress,
+        gifts,
+        message
+      });
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    getListByAddress();
+  }, [address]);
+
+  useEffect(() => {
+    // load()
+    getListByAddress();
+  }, []);
 
   return (
     <>
-      {
-        isListOwner()
-          ? <HostGiftsList giftList={getGiftList()} />
-          : <GuestGiftsList giftList={getGiftList()} />
+      { isLoading 
+        ? (
+          <Stack alignItems="center" height="100vh" justifyContent="center">
+            <CircularProgress />
+          </Stack>
+        ) : !!currentGiftList 
+          ? ( isListOwner()
+            ? <HostGiftsList giftList={currentGiftList} />
+            : <GuestGiftsList giftList={currentGiftList} />
+          ) : (
+            <Container sx={{ height: '100vh', alignItems: 'center' }}>
+              <Typography variant="h1" align="center">
+                404
+              </Typography>
+            </Container>
+          )
       }
     </>
     
