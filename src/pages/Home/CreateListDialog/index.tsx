@@ -34,7 +34,10 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
       let year = new Date(eventDate).getFullYear();
       let month = String(new Date(eventDate).getMonth() + 1);
       let day = String(new Date(eventDate).getDay());
-
+      
+      console.log(day);
+      console.log(month);
+      
       if (Number(day) < 10) {
         day = '0' + day;
       }
