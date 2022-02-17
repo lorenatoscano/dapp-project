@@ -21,7 +21,7 @@ export type GiftType = {
   id: number;
   title: string;
   imageUrl: string;
-  price: number;
+  price: string;
   gifted: boolean;
   gifter: string;
 };
@@ -36,7 +36,7 @@ export type GiftListType = {
 };
 
 const Home = () => {
-  const { checkIfWalletIsConnected, giftListContract, currentAccount, load } = useContext(WalletContext);
+  const { returnAllLists, isInitialized, load } = useContext(WalletContext);
 
   const [showDialog, setShowDialog] = useState(false);
   const [allLists, setAllLists] = useState<GiftListType[]>([]);
@@ -45,53 +45,56 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleCreateList = async () => {
-    if (await checkIfWalletIsConnected()) {
-      setShowDialog(true);
+    if (!isInitialized) {
+      await load();
     }
+
+    setShowDialog(true);
   }
 
   const handleManageList = () => {
-    console.log('Gerenciar lista');
+    // navigate(address);
   }
 
   const handleAccessList = async (address: string) => {
-    if (await checkIfWalletIsConnected()) {
-      navigate(address);
+    if (!isInitialized) {
+      await load();
     }
+    navigate(address);
+  }
+
+  const getAllLists = async() => {
+    try {
+      const lists = await returnAllLists();
+      const eventsList = [];
+      for (const list of lists) {
+        const { 
+          eventName,
+          hostsName,
+          eventDate,
+          ownerAddress,
+          gifts,
+          message
+        } : GiftListType = list;
+        
+        eventsList.push({
+          eventName,
+          hostsName,
+          eventDate,
+          ownerAddress,
+          gifts,
+          message
+        });
+      }
+
+      setAllLists(eventsList);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
   }
 
   useEffect(() => {
-    console.log("contrato:", giftListContract);
-    const getAllLists = async() => {
-      if (giftListContract) {
-        const lists = await giftListContract.methods.returnAllLists().call();
-        const eventsList = [];
-        for (const list of lists) {
-          const { 
-            eventName,
-            hostsName,
-            eventDate,
-            ownerAddress,
-            gifts,
-            message
-          } : GiftListType = list;
-          
-          
-          eventsList.push({
-            eventName,
-            hostsName,
-            eventDate,
-            ownerAddress,
-            gifts,
-            message
-          });
-        }
-
-        setAllLists(eventsList);
-        setLoading(false);
-      }
-    }
-    // load();
     getAllLists();
   }, []);
 

@@ -17,13 +17,14 @@ import { GiftListType, GiftType } from '../../Home';
 import { WalletContext } from '../../../contexts/WalletContext';
 import { TextField } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
+import Web3 from 'web3';
 
 type PropsType = {
   giftList: GiftListType;
 };
 
 const HostGiftsList = ({ giftList }: PropsType) => {
-  const { giftListContract, currentAccount } = useContext(WalletContext);
+  const { addGift, removeGift, finishList } = useContext(WalletContext);
 
   const [title, setTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -38,10 +39,8 @@ const HostGiftsList = ({ giftList }: PropsType) => {
 
   const handleAddGift = async() => {
     try {
-      if (giftListContract) {
-        await giftListContract.methods.addGift(String(price * Math.pow(10, 18)), title, imageUrl).send({ from: currentAccount });
-        navigate(`/${currentAccount}`);
-      }
+      await addGift(String(price * Math.pow(10, 18)), title, imageUrl);
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -50,10 +49,8 @@ const HostGiftsList = ({ giftList }: PropsType) => {
 
   const handleRemoveGift = async(id: number) => {
     try {
-      if (giftListContract) {
-        await giftListContract.methods.removeGift(id).send({ from: currentAccount });
-        navigate(`/${currentAccount}`);
-      }
+      await removeGift(id);
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -61,10 +58,8 @@ const HostGiftsList = ({ giftList }: PropsType) => {
 
   const handleCloseList = async() => {
     try {
-      if (giftListContract) {
-        await giftListContract.methods.finishList.send({ from: currentAccount });
-        navigate('/');
-      }
+      await finishList();
+      navigate('/');
     } catch (error) {
       console.log(error);
     }
@@ -192,7 +187,7 @@ const HostGiftsList = ({ giftList }: PropsType) => {
                     </Tooltip>
                     
                     <Typography variant="h6">
-                      {gift.price/1000000000000000000}
+                      {Web3.utils.fromWei(gift.price)}
                     </Typography>
                   </Stack>
                   <Button variant="contained" color="error" onClick={() => handleRemoveGift(gift.id)}>

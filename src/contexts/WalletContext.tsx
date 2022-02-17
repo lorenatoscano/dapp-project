@@ -2,6 +2,7 @@ import React, {
   createContext,
   ReactNode,
   useEffect,
+  useMemo,
   useState
 } from 'react';
 import Web3 from 'web3';
@@ -18,18 +19,27 @@ type WalletContextProviderProps = {
 
 type WalletContextType = {
   currentAccount: string;
+  isInitialized: boolean;
   load: () => Promise<void>;
-  checkIfWalletIsConnected: () => Promise<boolean>;
-  giftListContract: Contract | undefined;
+  createNewList: (hostsName: string, eventDate: string, eventName: string, message: string) => Promise<any>;
+  returnList: (address: string) => Promise<any>;
+  returnAllLists: () => Promise<any>;
+  addGift: (price: string, title: string, imageUrl: string) => Promise<any>;
+  removeGift: (id: number) => Promise<any>;
+  finishList: () => Promise<any>;
+  toGift: (id: number, toAddress: string, price: string) => Promise<any>;
 };
 
 export const WalletContext = createContext({} as WalletContextType);
 
+var giftListContract: Contract;
+
 export const WalletContextProvider = ({ children }: WalletContextProviderProps) => {
+  const [isInitialized, setIsInitialized] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [currentAccount, setCurrentAccount] = useState('');
-  const [giftListContract, setGiftListContract] = useState<Contract>();
+  // const [giftListContract, setGiftListContract] = useState<Contract>();
 
   const load = async () => {
     const { ethereum } = window;
@@ -43,38 +53,91 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
       } catch (error) {
         triggerAlert('Autorize o acesso à MetaMask para utilizar a aplicação.');
         console.error(error);
+        return;
       }  
       const web3 = new Web3(ethereum);
-      setGiftListContract(new web3.eth.Contract(abi as AbiItem[], contractAddress));
+      giftListContract = new web3.eth.Contract(abi as AbiItem[], contractAddress);
+      setIsInitialized(true);
     } else {
       triggerAlert('Por favor, instale a MetaMask!');
+      return;
     }
-  }
-
-  const checkIfWalletIsConnected = async() => {
-    const { ethereum } = window;
-    if (ethereum) {
-      try {
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts > 0) {
-          setCurrentAccount(accounts[0]);
-          return true;
-        }
-      } catch (error) {
-        triggerAlert('Autorize o acesso à MetaMask para utilizar a aplicação.');
-        console.error(error);
-        return false;
-      }  
-    } else {
-      triggerAlert('Por favor, instale a MetaMask!');
-    }
-
-    return false;
   }
 
   const triggerAlert = (message: string) => {
     setAlertMessage(message);
     setShowAlert(true);
+  }
+
+  const createNewList = async(hostsName: string, eventDate: string, eventName: string, message: string) => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .createNewList(hostsName, eventDate, eventName, message)
+      .send({ from: currentAccount });
+  }
+
+  const returnList = async(address?: string) => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .returnList(address)
+      .call();
+  }
+
+  const returnAllLists = async() => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .returnAllLists()
+      .call();
+  }
+
+
+  const addGift = async(price: string, title: string, imageUrl: string) => {
+    if (!isInitialized) {
+      await load();
+    }
+    
+    return giftListContract.methods
+      .addGift(price, title, imageUrl)
+      .send({ from: currentAccount });
+  }
+
+  const removeGift = async(id: number) => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .removeGift(id)
+      .send({ from: currentAccount });
+  }
+
+  const finishList = async() => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .finishList()
+      .send({ from: currentAccount });
+  }
+
+  const toGift = async(id: number, toAddress: string, price: string) => {
+    if (!isInitialized) {
+      await load();
+    }
+
+    return giftListContract.methods
+      .toGift(id, toAddress)
+      .send({ from: currentAccount, value: price});
   }
 
   useEffect(() => {
@@ -95,8 +158,25 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
     };
   }, []);
 
+  const values = useMemo(
+    () => ({
+      currentAccount,
+      load,
+      isInitialized,
+      giftListContract,
+      createNewList, 
+      returnAllLists,
+      returnList,
+      addGift,
+      removeGift,
+      finishList,
+      toGift
+    }),
+    [currentAccount]
+  );
+
   return (
-    <WalletContext.Provider value={{ currentAccount, load, checkIfWalletIsConnected, giftListContract }}>
+    <WalletContext.Provider value={values}>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={showAlert}

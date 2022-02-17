@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext }  from 'react';
+import React, { useContext }  from 'react';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -15,20 +15,21 @@ import Chip from '@mui/material/Chip';
 import { GiftListType, GiftType } from '../../Home';
 import { useParams } from 'react-router-dom';
 import { WalletContext } from '../../../contexts/WalletContext';
+import Web3 from 'web3';
 
 type PropsType = {
   giftList: GiftListType;
 };
 
 const GuestGiftsList = ({ giftList }: PropsType) => {
-  const { giftListContract, currentAccount } = useContext(WalletContext);
+  const { toGift } = useContext(WalletContext);
   const { address } = useParams();
 
-  const handleGiveGift = async(id: number, price: number) => {
+  const handleGiveGift = async(id: number, price: string) => {
     try {
-      if (giftListContract) {
-        await giftListContract.methods.toGift(id, address).send({ from: currentAccount, value: price});
-        // navigate(`/${currentAccount}`);
+      if (address) {
+        await toGift(id, address, price);
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);
@@ -97,7 +98,7 @@ const GuestGiftsList = ({ giftList }: PropsType) => {
                     </Tooltip>
                     
                     <Typography variant="h6">
-                      {gift.price/1000000000000000000}
+                      {Web3.utils.fromWei(gift.price)}
                     </Typography>
                   </Stack>
                   <Button variant="contained" disabled={gift.gifted} onClick={() => handleGiveGift(gift.id, gift.price)}>

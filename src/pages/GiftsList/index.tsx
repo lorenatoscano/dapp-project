@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom';
 import { WalletContext } from '../../contexts/WalletContext';
 import { GuestGiftsList } from './GuestGiftsList';
 import { HostGiftsList } from './HostGiftList';
-import { GiftType, GiftListType } from '../Home';
+import { GiftListType } from '../Home';
 import { Container, Stack, Typography } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 
 
 const GiftsList = () => {
-  const { giftListContract, currentAccount, load } = useContext(WalletContext);
+  const { currentAccount, returnList } = useContext(WalletContext);
 
   const [currentGiftList, setCurrentGiftList] = useState<GiftListType>();
   const [isLoading, setLoading] = useState(true);
@@ -23,38 +23,39 @@ const GiftsList = () => {
   }
 
   const getListByAddress = async() => {
-    if (giftListContract) {
-      const list = await giftListContract.methods.returnList(address).call();
-      let { 
-        eventName,
-        hostsName,
-        eventDate,
-        ownerAddress,
-        gifts,
-        message
-      } : GiftListType = list;
-
-      if (gifts.length && gifts[0].title === "") {
-        gifts = [];
+    try {
+      if (address) {
+        const list = await returnList(address);
+        let { 
+          eventName,
+          hostsName,
+          eventDate,
+          ownerAddress,
+          gifts,
+          message
+        } : GiftListType = list;
+  
+        if (gifts.length && gifts[0].title === "") {
+          gifts = [];
+        }
+        setCurrentGiftList({ 
+          eventName,
+          hostsName,
+          eventDate,
+          ownerAddress,
+          gifts,
+          message
+        });
       }
-      setCurrentGiftList({ 
-        eventName,
-        hostsName,
-        eventDate,
-        ownerAddress,
-        gifts,
-        message
-      });
+      
+    } catch (error) {
+      console.log(error);
     }
+
     setLoading(false);
   }
 
   useEffect(() => {
-    getListByAddress();
-  }, [address]);
-
-  useEffect(() => {
-    // load()
     getListByAddress();
   }, []);
 
@@ -73,6 +74,9 @@ const GiftsList = () => {
             <Container sx={{ height: '100vh', alignItems: 'center' }}>
               <Typography variant="h1" align="center">
                 404
+              </Typography>
+              <Typography variant="h3" align="center">
+                Nenhuma lista de presentes cadastrada nessa url
               </Typography>
             </Container>
           )

@@ -24,10 +24,12 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
   const [eventName, setEventName] = useState('');
   const [message, setMessage] = useState('');
 
-  const { giftListContract, currentAccount } = useContext(WalletContext);
+  // const { giftListContract, currentAccount } = useContext(WalletContext);
+  const { createNewList, currentAccount } = useContext(WalletContext);
+
   const navigate = useNavigate();
 
-  const createList = async () => {
+  const handleCreateList = async () => {
     if (eventDate !== null) {
       let year = new Date(eventDate).getFullYear();
       let month = String(new Date(eventDate).getMonth() + 1);
@@ -41,10 +43,8 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
       }
       const formatedDate = `${day}/${month}/${year}`;
       try {
-        if (giftListContract) {
-          await giftListContract.methods.createNewList(hostsName, formatedDate, eventName, message).send({ from: currentAccount });
-          navigate(currentAccount);
-        }
+        await createNewList(hostsName, formatedDate, eventName, message);
+        navigate(currentAccount);
       } catch (error) {
         console.log(error);
       }
@@ -103,7 +103,7 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
       </DialogContent>
       <DialogActions sx={{ pr: 3, pb: 2 }}>
         <Button onClick={handleCloseDialog}>Cancelar</Button>
-        <Button variant="contained" onClick={createList}>Criar lista</Button>
+        <Button variant="contained" onClick={handleCreateList}>Criar lista</Button>
       </DialogActions>
     </Dialog>
   );
