@@ -77,7 +77,6 @@ Acesse em seu navegador http://localhost:3000/ para ver o resultado.
 Algumas ideias para melhorar a aplicação:
 
 - Adicionar um indicador de "loading" durante as transações para o contrato.
-- Melhorar a página inicial, informando do que se trata a aplicação e tornando-a mais atrativa.
 - Adicionar um tema dark.
 
 Fique livre para sugerir novas melhorias e correções [criando uma issue](https://github.com/lorenatoscano/dapp-project/issues/new) 😉.

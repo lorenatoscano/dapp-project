@@ -33,10 +33,7 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
     if (eventDate !== null) {
       let year = new Date(eventDate).getFullYear();
       let month = String(new Date(eventDate).getMonth() + 1);
-      let day = String(new Date(eventDate).getDay());
-      
-      console.log(day);
-      console.log(month);
+      let day = String(new Date(eventDate).getDate());
       
       if (Number(day) < 10) {
         day = '0' + day;
@@ -49,7 +46,7 @@ const CreateListDialog = ({ showDialog, handleCloseDialog }: DialogProps) => {
         await createNewList(hostsName, formatedDate, eventName, message);
         navigate(currentAccount);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
