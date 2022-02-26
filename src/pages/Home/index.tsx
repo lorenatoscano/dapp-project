@@ -113,7 +113,6 @@ const Home = () => {
       <CreateListDialog showDialog={showDialog} handleCloseDialog={() => setShowDialog(false)} />
       <Box
         sx={{
-          bgcolor: 'background.paper',
           pt: 8,
           pb: 6,
         }}
