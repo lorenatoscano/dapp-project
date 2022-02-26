@@ -15,7 +15,7 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import { CircularProgress } from '@mui/material';
 import { WalletContext } from '../../contexts/WalletContext';
 import { CreateListDialog } from './CreateListDialog';
-
+import giftsImg from '../../assets/Gifts-amico.svg';
 
 export type GiftType = {
   id: number;
@@ -111,83 +111,97 @@ const Home = () => {
   return (
     <>
       <CreateListDialog showDialog={showDialog} handleCloseDialog={() => setShowDialog(false)} />
-      <Box
-        sx={{
-          pt: 8,
-          pb: 6,
-        }}
-      >
-        <Container maxWidth="sm">
-          <Box sx={{ mb: 8 }}>
-            <Typography variant="h4" align="center" gutterBottom>
-              Quero criar uma lista
-            </Typography>
-            <Stack
-              sx={{ pt: 2 }}
-              direction="row"
-              spacing={2}
-              justifyContent="center"
+      <Grid container component="main" sx={{ height: '100vh' }}>
+        <Grid item xs={12} md={6} component="section" sx={{ bgcolor: 'background.paper', display: { xs: 'none', md: 'block'} }}>
+          <Stack justifyContent="center" alignItems="center" sx={{ height: '100%', pt: 8, pb: 2 }}>
+            <img src={giftsImg} alt="Ilustração de presentes" width="70%" />
+            
+            <Typography 
+              component="h1" 
+              variant="h4" 
+              align="center" 
+              sx={{ flexGrow: 1, fontWeight: 500, maxWidth: 450 }} 
+              color="text.secondary"
+              gutterBottom
             >
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item>
-                  <Button variant="contained" color="primary" onClick={handleCreateList}>
-                    Criar minha lista
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button variant="outlined" color="primary" onClick={handleManageList}>
-                    Gerenciar minha lista
-                  </Button>
-                </Grid>
-              </Grid>
-            </Stack>
-          </Box>
-
-          <Divider />
-
-          <Box sx={{ mt: 8 }}>
-            <Typography variant="h4" align="center" gutterBottom>
-              Quero presentear
+              Crie sua lista de presentes na rede Ethereum
             </Typography>
-            { isLoading 
-              ? (
-                <Stack alignItems="center">
-                  <CircularProgress />
-                </Stack>
-              ) : allLists.length > 0 
+          </Stack>
+          
+        </Grid>
+        <Grid item xs={12} md={6} component="section" style={{ paddingTop: '10%' }} sx={{ height: '100%', overflowY: 'auto' }}>
+          <Container maxWidth="sm">
+            <Box sx={{ mb: 8 }}>
+              <Typography component="h2" variant="h4" align="center" gutterBottom>
+                Quero criar uma lista
+              </Typography>
+              <Stack
+                sx={{ pt: 2 }}
+                direction="row"
+                spacing={2}
+                justifyContent="center"
+              >
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item>
+                    <Button variant="contained" color="primary" onClick={handleCreateList}>
+                      Criar minha lista
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button variant="outlined" color="primary" onClick={handleManageList}>
+                      Gerenciar minha lista
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Box>
+
+            <Divider />
+
+            <Box sx={{ mt: 8 }}>
+              <Typography component="h2" variant="h4" align="center" gutterBottom>
+                Quero presentear
+              </Typography>
+              { isLoading 
                 ? (
-                  <List>
-                    {
-                      allLists.map((giftList) => (
-                        <ListItem
-                          secondaryAction={
-                            <IconButton
-                              edge="end"
-                              aria-label="Acessar lista"
-                              onClick={() => handleAccessList(giftList.ownerAddress)}
-                            >
-                              <RedeemIcon color="primary" />
-                            </IconButton>
-                          }
-                          key={giftList.ownerAddress}
-                        >
-                          <ListItemText
-                            primary={`${giftList.eventName} de ${giftList.hostsName}`}
-                            secondary={giftList.eventDate}
-                          />
-                        </ListItem>
-                      ))
-                    }
-                  </List>
-                ) : (
-                  <Typography align="center" gutterBottom>
-                    Ainda não existem listas de presentes cadastradas.
-                  </Typography>
-                )
-            }
-          </Box>
-        </Container>
-      </Box>
+                  <Stack alignItems="center">
+                    <CircularProgress />
+                  </Stack>
+                ) : allLists.length > 0 
+                  ? (
+                    <List>
+                      {
+                        allLists.map((giftList) => (
+                          <ListItem
+                            secondaryAction={
+                              <IconButton
+                                edge="end"
+                                aria-label="Acessar lista"
+                                onClick={() => handleAccessList(giftList.ownerAddress)}
+                              >
+                                <RedeemIcon color="primary" />
+                              </IconButton>
+                            }
+                            key={giftList.ownerAddress}
+                          >
+                            <ListItemText
+                              primary={`${giftList.eventName} de ${giftList.hostsName}`}
+                              secondary={giftList.eventDate}
+                            />
+                          </ListItem>
+                        ))
+                      }
+                    </List>
+                  ) : (
+                    <Typography align="center" gutterBottom>
+                      Ainda não existem listas de presentes cadastradas.
+                    </Typography>
+                  )
+              }
+            </Box>
+          </Container>
+        </Grid>
+      </Grid> 
     </>
   );
 };
