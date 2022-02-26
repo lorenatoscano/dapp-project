@@ -84,7 +84,7 @@ Fique livre para sugerir novas melhorias e correções [criando uma issue](https
 
 ## Licença e Autores
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](https://github.com/lorenatoscano/dapp-project/main/LICENSE) para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](https://github.com/lorenatoscano/dapp-project/blob/main/LICENSE) para mais detalhes.
 
 Feito com 💜 por [Lorena Toscano](https://github.com/lorenatoscano) e [João Vitor](https://github.com/joaovdxavier).
 
